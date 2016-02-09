@@ -13,6 +13,8 @@ import uk.co.snodnipper.android.issue198613.tintdrawables.R;
 
 public class TintAppCompatButton extends android.support.v7.widget.AppCompatButton {
 
+    private static final PorterDuff.Mode DEFAULT_TINT_MODE = PorterDuff.Mode.SRC_IN;
+
     private static final int LEFT = 0;
     private static final int TOP = 1;
     private static final int RIGHT = 2;
@@ -42,23 +44,20 @@ public class TintAppCompatButton extends android.support.v7.widget.AppCompatButt
                 defStyleAttr, 0);
 
         try {
-            if (a.hasValue(R.styleable.TintAppCompatButton_drawableTintMode)) {
-                PorterDuff.Mode tintMode = DrawableUtils.parseTintMode(
-                        a.getInt(R.styleable.TintAppCompatButton_drawableTintMode, -1), null);
+            PorterDuff.Mode tintMode = DrawableUtils.parseTintMode(
+                    a.getInt(R.styleable.TintAppCompatButton_drawableTintMode, -1),
+                    DEFAULT_TINT_MODE);
 
-                boolean hasTintMode = tintMode != null;
-                boolean hasColor = a.hasValue(R.styleable.TintAppCompatButton_drawableTint);
+            boolean hasColor = a.hasValue(R.styleable.TintAppCompatButton_drawableTint);
+            if (hasColor) {
+                int color = a.getColor(R.styleable.TintAppCompatButton_drawableTint,
+                        Color.TRANSPARENT);
 
-                if (hasTintMode && hasColor) {
-                    int color = a.getColor(R.styleable.TintAppCompatButton_drawableTint,
-                            Color.TRANSPARENT);
-
-                    Drawable[] ds = getCompoundDrawables();
-                    tint(ds[LEFT], color, tintMode);
-                    tint(ds[TOP], color, tintMode);
-                    tint(ds[RIGHT], color, tintMode);
-                    tint(ds[BOTTOM], color, tintMode);
-                }
+                Drawable[] ds = getCompoundDrawables();
+                tint(ds[LEFT], color, tintMode);
+                tint(ds[TOP], color, tintMode);
+                tint(ds[RIGHT], color, tintMode);
+                tint(ds[BOTTOM], color, tintMode);
             }
         } finally {
             a.recycle();
@@ -66,6 +65,10 @@ public class TintAppCompatButton extends android.support.v7.widget.AppCompatButt
     }
 
     private void tint(Drawable d, int color, PorterDuff.Mode tintMode) {
+        boolean isTintable = d != null && tintMode != null;
+        if (!isTintable) {
+            return;
+        }
         TintInfo ti = new TintInfo();
         ti.mTintMode = tintMode;
         ti.mTintList = ColorStateList.valueOf(color);

@@ -1,7 +1,7 @@
 package uk.co.snodnipper.android.issue198613.tintdrawables;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 public class DemoActivity extends AppCompatActivity {
 
